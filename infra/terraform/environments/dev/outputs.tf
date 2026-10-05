@@ -33,3 +33,17 @@ output "gke_cluster" {
   description = "Optional ephemeral GKE cluster name (empty when enable_gke=false)"
   value       = var.enable_gke ? google_container_cluster.primary[0].name : ""
 }
+
+output "cost_profile" {
+  description = "Active cost profile"
+  value = {
+    cheap_mode       = var.cheap_mode
+    machine_type     = local.effective_machine_type
+    disk_size_gb     = local.effective_disk_size
+    gke_enabled      = var.enable_gke
+    autostop_enabled = var.enable_autostop
+    start_schedule   = var.enable_autostop ? var.vm_start_schedule : ""
+    stop_schedule    = var.enable_autostop ? var.vm_stop_schedule : ""
+    budget_gbp       = var.budget_limit_gbp
+  }
+}

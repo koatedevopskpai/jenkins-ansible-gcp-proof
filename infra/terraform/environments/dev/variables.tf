@@ -20,14 +20,34 @@ variable "environment" {
 
 # --- Compute ---
 variable "jenkins_machine_type" {
-  description = "Jenkins controller VM type (e2-medium = 4GB; Jenkins + plugins need headroom)"
+  description = "Jenkins controller VM type when cheap_mode=false (e2-medium = 4GB; Jenkins + plugins need headroom)"
   type        = string
   default     = "e2-medium"
 }
 
 variable "root_volume_size" {
-  type    = number
-  default = 40
+  description = "Boot disk size (GB) when cheap_mode=false"
+  type        = number
+  default     = 40
+}
+
+# --- cheap_mode: the cost-saving toggle (make cheap) ---
+variable "cheap_mode" {
+  description = "Cost-saving profile: e2-small VM + smaller disk. Ansible adds swap so Jenkins still fits in 2GB. Toggle with `make cheap`."
+  type        = bool
+  default     = true
+}
+
+variable "cheap_machine_type" {
+  description = "Jenkins VM type when cheap_mode=true"
+  type        = string
+  default     = "e2-small"
+}
+
+variable "cheap_disk_size" {
+  description = "Boot disk size (GB) when cheap_mode=true"
+  type        = number
+  default     = 20
 }
 
 variable "jenkins_image" {
@@ -88,6 +108,31 @@ variable "enable_gke" {
   default     = false
 }
 
+# --- Auto start/stop schedule (Cloud Scheduler) ---
+variable "enable_autostop" {
+  description = "Schedule the Jenkins VM to start/stop on weekdays so it is off nights and weekends. The single biggest cost lever."
+  type        = bool
+  default     = true
+}
+
+variable "autostop_timezone" {
+  description = "Time zone for the start/stop schedules"
+  type        = string
+  default     = "Europe/London"
+}
+
+variable "vm_start_schedule" {
+  description = "Cron for starting the VM (8am weekdays)"
+  type        = string
+  default     = "0 8 * * 1-5"
+}
+
+variable "vm_stop_schedule" {
+  description = "Cron for stopping the VM (7pm weekdays)"
+  type        = string
+  default     = "0 19 * * 1-5"
+}
+
 # --- FinOps tagging taxonomy ---
 variable "cost_center" {
   type    = string
@@ -131,9 +176,9 @@ variable "billing_account_id" {
 }
 
 variable "budget_limit_gbp" {
-  description = "Hard monthly budget cap in GBP (billing account currency)"
+  description = "Hard monthly budget cap in the billing account currency. Default 8 GBP is approx the requested $10 hard budget."
   type        = number
-  default     = 10
+  default     = 8
 }
 
 variable "budget_alerts_email" {

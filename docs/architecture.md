@@ -77,5 +77,12 @@ idempotent and announce changes via handlers (`Restart jenkins`, `Restart docker
 ## Cost & FinOps
 
 - Every resource carries the shared label taxonomy (`workload`, `cost_center`, ...).
-- A hard monthly budget (GBP10) scoped to the `workload` label alerts at 80% and 100%.
-- GKE is optional and off by default; tear down with `scripts/down.ps1` when idle.
+- A hard monthly budget (8 GBP, approx a $10 cap) scoped to the `workload` label
+  alerts at 80% and 100%.
+- **Cloud Scheduler** starts/stops the Jenkins VM at 08:00/19:00 weekdays, so the
+  VM is off nights and weekends (the biggest cost lever). The scheduler calls the
+  Compute Engine API directly with an OAuth token - no Cloud Function needed.
+- **`cheap_mode`** (default true) selects an e2-small VM + 20GB disk; the Ansible
+  `common` role adds a 2GB swap file so Jenkins is still usable in 2GB RAM.
+- GKE is optional and off by default; tear down with `scripts/down.ps1` or
+  `make down` when idle (back to ~$0/month).

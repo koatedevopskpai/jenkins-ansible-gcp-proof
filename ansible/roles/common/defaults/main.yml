@@ -6,6 +6,11 @@ ufw_allowed:
   - "8080/tcp"
   - "50000/tcp"
 
+# Swap keeps Jenkins usable on the cheap_mode e2-small VM (2GB RAM).
+enable_swap: true
+swapfile_path: /swapfile
+swap_size_mb: 2048
+
 common_packages:
   - git
   - curl

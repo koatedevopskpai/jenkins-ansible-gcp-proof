@@ -4,6 +4,8 @@
 # --- Base host ---
 timezone: Europe/London
 enable_ufw: false
+enable_swap: true
+swap_size_mb: 2048
 ufw_allowed:
   - OpenSSH
   - "8080/tcp"

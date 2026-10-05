@@ -80,6 +80,9 @@ Copy-Item infra\terraform\environments\dev\terraform.tfvars.example `
 # 2. Provision + write the Ansible inventory
 scripts\up.ps1
 
+#    ...or, cross-platform (recommended cheap profile):
+make cheap
+
 # 3. Configure Jenkins with Ansible (from WSL or Cloud Shell)
 cd ansible
 ansible-galaxy collection install -r requirements.yml
@@ -105,15 +108,43 @@ scripts\down.ps1
 
 | Component | ~$/mo |
 |---|---|
-| Jenkins GCE VM (e2-medium, always-on) | ~25 |
-| Boot disk (40GB pd-balanced) | ~4 |
+| Jenkins GCE VM (e2-small cheap_mode, weekday-only) | ~8 |
+| Boot disk (20GB pd-balanced) | ~2 |
+| Static external IP (in use) | ~3.65 |
 | Cloud Run demo (scale-to-zero) | ~0 |
 | Artifact Registry (few images) | <1 |
-| Networking / IAM / Ops Agent | ~0 |
-| **Total** | **~30** - under a **GBP10** guardrail once idle; tear down when not demoing |
+| Cloud Scheduler (2 jobs) / IAM / Ops Agent | ~0 |
+| **Total (cheap_mode, weekday schedule)** | **~14** |
+| **Total (destroy between demos)** | **~0** |
 
 GKE is optional (`enable_gke = true`) and excluded - the management fee (~$73/mo)
 does not fit the budget.
+
+## Cost guardrails
+
+Three layers keep this project honest on spend:
+
+1. **Hard budget** - `budget_limit_gbp = 8` (approx a **$10 hard cap**) scoped to
+   the `workload` label, alerting at 80% and 100%. It fails safe: if the VM is
+   left on, the alerts fire within days.
+2. **Auto start/stop** - Cloud Scheduler starts the VM at 08:00 and stops it at
+   19:00 on weekdays (`enable_autostop = true`, `Europe/London`). The VM is off
+   nights and weekends - the biggest single lever (~55-65% off the VM bill).
+   Because the budget is intentionally tight, this is what keeps a running
+   environment under it.
+3. **`cheap_mode` toggle** - `make cheap` switches to an **e2-small** VM + 20GB
+   disk (Ansible adds a 2GB swap file so Jenkins still fits). `make full` returns
+   to e2-medium; `make down` tears everything down to **~$0/month**.
+
+```bash
+make cheap     # recommended: small VM, no GKE, weekday-only
+make full      # e2-medium + 40GB when you need headroom
+make gke       # spin up the ephemeral GKE demo target (record the screenshots, then make down)
+make down      # destroy everything (~$0/month)
+```
+
+> Prices are us-central1, USD, on-demand. Check the
+> [GCP pricing calculator](https://cloud.google.com/products/calculator) for your region.
 
 ## Evidence checklist
 

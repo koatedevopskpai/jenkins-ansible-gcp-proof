@@ -15,6 +15,7 @@ locals {
     "logging.googleapis.com",
     "monitoring.googleapis.com",
     "cloudbilling.googleapis.com",
+    "cloudscheduler.googleapis.com",
     "secretmanager.googleapis.com",
     "iap.googleapis.com",
   ]

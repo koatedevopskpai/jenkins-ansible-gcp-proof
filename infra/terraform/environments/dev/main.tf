@@ -43,4 +43,9 @@ data "google_project" "current" {}
 
 locals {
   name_prefix = "jenkins-ansible-${var.environment}"
+
+  # cheap_mode picks the smaller VM/disk; the auto-stop schedule keeps either
+  # profile cheap by only running it on weekdays.
+  effective_machine_type = var.cheap_mode ? var.cheap_machine_type : var.jenkins_machine_type
+  effective_disk_size    = var.cheap_mode ? var.cheap_disk_size : var.root_volume_size
 }

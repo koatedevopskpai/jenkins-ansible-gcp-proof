@@ -27,3 +27,44 @@
     policy: deny
     direction: incoming
   when: enable_ufw | bool
+
+# --- Swap (keeps Jenkins responsive on the cheap_mode e2-small VM) ---
+- name: Create the swap file
+  ansible.builtin.command:
+    cmd: "dd if=/dev/zero of={{ swapfile_path }} bs=1M count={{ swap_size_mb }}"
+    creates: "{{ swapfile_path }}"
+  when: enable_swap | bool
+
+- name: Set swap file permissions
+  ansible.builtin.file:
+    path: "{{ swapfile_path }}"
+    owner: root
+    group: root
+    mode: "0600"
+  when: enable_swap | bool
+
+- name: Format the swap file
+  ansible.builtin.command:
+    cmd: "mkswap {{ swapfile_path }}"
+  register: swap_mkswap
+  changed_when: "'Setting up swapspace' in (swap_mkswap.stdout | default(''))"
+  when: enable_swap | bool
+
+- name: Enable the swap file now
+  ansible.builtin.command:
+    cmd: "swapon {{ swapfile_path }}"
+  register: swap_swapon
+  changed_when: swap_swapon.rc == 0
+  failed_when: false
+  when: enable_swap | bool
+
+- name: Persist the swap file in /etc/fstab
+  ansible.posix.mount:
+    path: none
+    src: "{{ swapfile_path }}"
+    fstype: swap
+    opts: sw
+    dump: "0"
+    passno: "0"
+    state: present
+  when: enable_swap | bool

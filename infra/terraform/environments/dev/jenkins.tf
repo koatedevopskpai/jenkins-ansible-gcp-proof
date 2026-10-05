@@ -14,13 +14,13 @@ resource "google_compute_address" "jenkins" {
 
 resource "google_compute_instance" "jenkins" {
   name         = "${local.name_prefix}-jenkins"
-  machine_type = var.jenkins_machine_type
+  machine_type = local.effective_machine_type
   zone         = var.zone
 
   boot_disk {
     initialize_params {
       image = var.jenkins_image
-      size  = var.root_volume_size
+      size  = local.effective_disk_size
       type  = "pd-balanced"
     }
   }
