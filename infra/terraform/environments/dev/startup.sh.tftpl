@@ -1,0 +1,11 @@
+#!/bin/bash
+# Minimal host bootstrap so Ansible can manage this Jenkins controller.
+# Terraform provisions the VM; Ansible does the real configuration.
+set -euxo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y python3 python3-apt sudo curl gnupg git ca-certificates
+
+# Ansible connects as the login user with sudo; ensure it exists and is ready.
+echo "jenkins-ansible-gcp-proof bootstrap complete"

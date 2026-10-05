@@ -1,0 +1,62 @@
+---
+# gcloud CLI, kubectl, helm and Trivy - the CLI toolchain the Jenkins pipeline
+# uses to build, scan and deploy.
+
+- name: Add the Google Cloud public signing key
+  ansible.builtin.get_url:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    dest: /etc/apt/keyrings/cloud.google.gpg
+    mode: "0644"
+
+- name: Add the Google Cloud apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main"
+    filename: google-cloud-sdk
+    state: present
+
+- name: Install gcloud, kubectl and the GKE auth plugin
+  ansible.builtin.apt:
+    name:
+      - google-cloud-cli
+      - google-cloud-cli-gke-gcloud-auth-plugin
+      - kubectl
+    state: present
+    update_cache: true
+
+- name: Download Helm
+  ansible.builtin.get_url:
+    url: "https://get.helm.sh/helm-{{ helm_version }}-linux-{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}.tar.gz"
+    dest: /tmp/helm.tar.gz
+    mode: "0644"
+
+- name: Extract Helm
+  ansible.builtin.unarchive:
+    src: /tmp/helm.tar.gz
+    dest: /tmp
+    remote_src: true
+
+- name: Install the Helm binary
+  ansible.builtin.copy:
+    src: "/tmp/linux-{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}/helm"
+    dest: /usr/local/bin/helm
+    remote_src: true
+    mode: "0755"
+
+# --- Trivy (image scanning used by the Jenkins pipeline) ---
+- name: Add the Trivy signing key
+  ansible.builtin.get_url:
+    url: https://aquasecurity.github.io/trivy-repo/deb/public.key
+    dest: /etc/apt/keyrings/trivy.asc
+    mode: "0644"
+
+- name: Add the Trivy apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/trivy.asc] https://aquasecurity.github.io/trivy-repo/deb {{ ansible_distribution_release }} main"
+    filename: trivy
+    state: present
+
+- name: Install Trivy
+  ansible.builtin.apt:
+    name: trivy
+    state: present
+    update_cache: true

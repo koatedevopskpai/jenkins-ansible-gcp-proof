@@ -1,0 +1,20 @@
+---
+jenkins_java_package: openjdk-17-jre-headless
+jenkins_port: 8080
+jenkins_admin_user: admin
+jenkins_shared_library_name: platform-lib
+jenkins_shared_library_repo: "https://github.com/koatedevopskpai/jenkins-ansible-gcp-proof.git"
+jenkins_plugins:
+  - configuration-as-code
+  - git
+  - workflow-aggregator
+  - workflow-cps-global-lib
+  - github
+  - docker-workflow
+  - pipeline-utility-steps
+  - credentials-binding
+  - google-oauth-plugin
+  - google-kubernetes-engine
+  - ws-cleanup
+  - timestamper
+  - ansicolor

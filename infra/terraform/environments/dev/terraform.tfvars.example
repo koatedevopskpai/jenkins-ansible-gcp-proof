@@ -1,0 +1,18 @@
+# Copy to terraform.tfvars and fill in your values.
+project_id          = "your-gcp-project-id"
+billing_account_id  = "XXXXXX-XXXXXX-XXXXXX"
+region              = "us-central1"
+zone                = "us-central1-a"
+
+# Restrict Jenkins/SSH access. IAP range is included by default; add your IP:
+# ssh_cidr = ["35.235.240.0/20", "203.0.113.4/32"]
+
+# Jenkins controller size (e2-medium recommended for Jenkins + plugins)
+# jenkins_machine_type = "e2-medium"
+
+# Optional ephemeral GKE demo target (adds the ~$73/mo management fee)
+# enable_gke = true
+
+# Budget
+budget_limit_gbp   = 10
+budget_alerts_email = "koatekpai@outlook.com"

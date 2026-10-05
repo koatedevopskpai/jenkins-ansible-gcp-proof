@@ -1,0 +1,38 @@
+# --- Terraform ---
+infra/terraform/**/.terraform/
+infra/terraform/**/*.tfstate*
+infra/terraform/**/*.tfvars
+!infra/terraform/**/*.tfvars.example
+infra/terraform/**/crash.log
+
+# --- Ansible ---
+ansible/inventory/hosts.ini
+ansible/**/retry
+ansible/**/*.retry
+*.vault_pass
+.ansible/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node ---
+node_modules/
+dist/
+
+# --- GCP / secrets ---
+.env
+*.json
+!infra/terraform/**/schemas/*.json
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

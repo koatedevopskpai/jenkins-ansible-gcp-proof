@@ -1,0 +1,39 @@
+# Jenkins Configuration-as-Code (JCasC).
+# Allows no sign-up, creates the admin user from JENKINS_ADMIN_PASSWORD, and
+# wires the Groovy shared library directly from this repo.
+jenkins:
+  systemMessage: "jenkins-ansible-gcp-proof | managed by Ansible + JCasC"
+  numExecutors: 2
+  mode: NORMAL
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "{{ jenkins_admin_user }}"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  labelString: "controller linux docker"
+
+tool:
+  git:
+    installations:
+      - name: Default
+        home: git
+
+unclassified:
+  location:
+    adminAddress: "koatekpai@outlook.com"
+    url: "http://{{ ansible_default_ipv4.address | default('localhost') }}:{{ jenkins_port }}/"
+  globalLibraries:
+    libraries:
+      - name: "{{ jenkins_shared_library_name }}"
+        defaultVersion: main
+        implicit: false
+        allowVersionOverride: true
+        retriever:
+          modernSCM:
+            scm:
+              git:
+                remote: "{{ jenkins_shared_library_repo }}"

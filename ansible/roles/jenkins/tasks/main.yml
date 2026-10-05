@@ -1,0 +1,75 @@
+---
+- name: Install the Java runtime
+  ansible.builtin.apt:
+    name: "{{ jenkins_java_package }}"
+    state: present
+
+- name: Add the Jenkins signing key
+  ansible.builtin.get_url:
+    url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    dest: /etc/apt/keyrings/jenkins.asc
+    mode: "0644"
+
+- name: Add the Jenkins apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/jenkins.asc] https://pkg.jenkins.io/debian-stable binary/"
+    filename: jenkins
+    state: present
+
+- name: Install Jenkins
+  ansible.builtin.apt:
+    name: jenkins
+    state: present
+    update_cache: true
+  notify: Restart jenkins
+
+- name: Add the jenkins user to the docker group
+  ansible.builtin.user:
+    name: jenkins
+    groups: docker
+    append: true
+  notify: Restart jenkins
+
+- name: Ensure the JCasC configuration directory exists
+  ansible.builtin.file:
+    path: /var/lib/jenkins/casc_configs
+    state: directory
+    owner: jenkins
+    group: jenkins
+    mode: "0750"
+
+- name: Deploy Jenkins Configuration-as-Code
+  ansible.builtin.template:
+    src: jenkins.yaml.j2
+    dest: /var/lib/jenkins/casc_configs/jenkins.yaml
+    owner: jenkins
+    group: jenkins
+    mode: "0640"
+  notify: Restart jenkins
+
+- name: Configure the Jenkins environment (admin password + JCasC path)
+  ansible.builtin.blockinfile:
+    path: /etc/default/jenkins
+    create: true
+    marker: "# {mark} ANSIBLE MANAGED - jenkins-ansible-gcp-proof"
+    block: |
+      JENKINS_ADMIN_PASSWORD={{ jenkins_admin_password }}
+      CASC_JENKINS_CONFIG=/var/lib/jenkins/casc_configs
+    mode: "0640"
+  notify: Restart jenkins
+
+- name: Install Jenkins plugins
+  ansible.builtin.command:
+    cmd: "jenkins-plugin-cli --plugins {{ jenkins_plugins | join(' ') }}"
+  become_user: jenkins
+  environment:
+    JENKINS_HOME: /var/lib/jenkins
+  register: jenkins_plugin_install
+  changed_when: "'already installed' not in jenkins_plugin_install.stdout"
+  notify: Restart jenkins
+
+- name: Ensure Jenkins is running and enabled
+  ansible.builtin.service:
+    name: jenkins
+    state: started
+    enabled: true

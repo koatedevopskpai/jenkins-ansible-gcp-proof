@@ -1,0 +1,13 @@
+---
+# Install the Google Cloud Ops Agent so the controller ships logs/metrics into
+# Cloud Logging and Cloud Monitoring.
+- name: Install the Google Cloud Ops Agent
+  ansible.builtin.shell:
+    cmd: |
+      set -euo pipefail
+      curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
+      bash add-google-cloud-ops-agent-repo.sh --also-install
+  args:
+    creates: /opt/google-cloud-ops-agent
+    chdir: /tmp
+  when: install_ops_agent | bool

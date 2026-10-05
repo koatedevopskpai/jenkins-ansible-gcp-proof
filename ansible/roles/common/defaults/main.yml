@@ -1,0 +1,21 @@
+---
+timezone: Europe/London
+enable_ufw: false
+ufw_allowed:
+  - OpenSSH
+  - "8080/tcp"
+  - "50000/tcp"
+
+common_packages:
+  - git
+  - curl
+  - gnupg
+  - ca-certificates
+  - python3-pip
+  - python3-apt
+  - jq
+  - unzip
+  - htop
+  - chrony
+  - apt-transport-https
+  - software-properties-common

@@ -1,0 +1,29 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+  notify: Restart cron
+
+- name: Allow firewall ports (UFW)
+  community.general.ufw:
+    rule: allow
+    name: "{{ item }}"
+  loop: "{{ ufw_allowed }}"
+  when: enable_ufw | bool
+
+- name: Enable UFW with a default-deny inbound policy
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
+  when: enable_ufw | bool
