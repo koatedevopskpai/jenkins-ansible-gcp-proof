@@ -176,7 +176,7 @@ variable "billing_account_id" {
 }
 
 variable "budget_limit_gbp" {
-  description = "Hard monthly budget cap in the billing account currency. Default 8 GBP is approx the requested $10 hard budget."
+  description = "Monthly budget alert amount in the billing account currency (GBP expected); notifications do not cap spending. Default 8 GBP."
   type        = number
   default     = 8
 }

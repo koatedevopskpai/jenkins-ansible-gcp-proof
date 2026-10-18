@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# FinOps cost guardrail - hard budget scoped to this workload's label.
+# FinOps notifications - monthly budget alerts scoped to this workload's label; no spending cap.
 # GCP budgets use the BILLING ACCOUNT's currency (GBP here).
 # -----------------------------------------------------------------------------
 

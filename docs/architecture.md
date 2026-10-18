@@ -77,8 +77,9 @@ idempotent and announce changes via handlers (`Restart jenkins`, `Restart docker
 ## Cost & FinOps
 
 - Every resource carries the shared label taxonomy (`workload`, `cost_center`, ...).
-- A hard monthly budget (8 GBP, approx a $10 cap) scoped to the `workload` label
-  alerts at 80% and 100%.
+- A monthly budget alert amount, configured by `budget_limit_gbp` (default 8 GBP),
+  is scoped to this project and the `workload` label, with alerts at 80% and 100%.
+  The budget sends notifications; it does not stop resources or cap spending.
 - **Cloud Scheduler** starts/stops the Jenkins VM at 08:00/19:00 weekdays, so the
   VM is off nights and weekends (the biggest cost lever). The scheduler calls the
   Compute Engine API directly with an OAuth token - no Cloud Function needed.
