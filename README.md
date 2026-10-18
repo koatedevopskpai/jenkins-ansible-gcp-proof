@@ -1,7 +1,7 @@
 # jenkins-ansible-gcp-proof
 
-**Jenkins CI/CD + Ansible configuration management on Google Cloud** - a public,
-NDA-proof reference implementation showing how to provision a GCP host with
+**Jenkins CI/CD + Ansible configuration management on Google Cloud** - a public
+reference implementation showing how to provision a GCP host with
 Terraform, configure it end to end with Ansible, and drive a Jenkins (Groovy)
 pipeline that builds, tests, scans and deploys a container to Cloud Run.
 
@@ -47,7 +47,7 @@ pipeline that builds, tests, scans and deploys a container to Cloud Run.
 | **Container security** | Trivy image scan stage that fails the build on HIGH/CRITICAL |
 | **Artifact Registry** | `artifact.tf` + `pushImage` stage |
 | **Cloud Run deploy** | `deployToRun` shared-library step |
-| **FinOps** | Label taxonomy + hard monthly budget with 80%/100% alerts |
+| **FinOps** | Label taxonomy + workload-filtered monthly budget alerts at 80%/100%; no spending cap |
 | **Observability** | Cloud Ops Agent + Cloud Logging/Monitoring |
 
 ## Repository map
@@ -153,3 +153,10 @@ make down      # destroy everything (~$0/month)
 - [ ] `ansible-playbook site.yml` run showing idempotent `ok`/`changed`
 - [ ] Cloud Run service URL serving `/health`
 - [ ] Cloud Monitoring dashboard / budget alert
+
+
+## Claim review — 18 October 2026
+
+See [verification and limits](evidence/W5-10.md) for the source revision, claim
+classification and observed CI status. Wording corrections do not establish a
+new deployment, passing test suite or production operation.
